@@ -10,7 +10,7 @@ type Node struct {
 	Random *Node
 }
 
-func copyRandomList(head *Node) *Node {
+func copyRandomList1(head *Node) *Node {
 	if head == nil {
 		return nil
 	}

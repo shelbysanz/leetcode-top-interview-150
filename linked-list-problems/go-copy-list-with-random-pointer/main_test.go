@@ -83,7 +83,10 @@ func Test_copyRandomList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			if got := copyRandomList(sliceToNode(tt.args.head)); !reflect.DeepEqual(nodeToSlice(got), tt.want) {
+			if got := copyRandomList1(sliceToNode(tt.args.head)); !reflect.DeepEqual(nodeToSlice(got), tt.want) {
+				t.Errorf("copyRandomList() = %v, want %v", got, tt.want)
+			}
+			if got := copyRandomList2(sliceToNode(tt.args.head)); !reflect.DeepEqual(nodeToSlice(got), tt.want) {
 				t.Errorf("copyRandomList() = %v, want %v", got, tt.want)
 			}
 		})
