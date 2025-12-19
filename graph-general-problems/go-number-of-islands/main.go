@@ -16,15 +16,19 @@ func numIslands(grid [][]byte) int {
 		// mark visited
 		grid[r][c] = '0'
 
+		// visit neighbor
 		search(r+1, c)
 		search(r-1, c)
 		search(r, c+1)
 		search(r, c-1)
 	}
 
-	for range rows {
-		for range cols {
-			if grid[r]
+	for r := range rows {
+		for c := range cols {
+			if grid[r][c] == '1' {
+				search(r, c)
+				island_count++
+			}
 		}
 	}
 	return island_count
