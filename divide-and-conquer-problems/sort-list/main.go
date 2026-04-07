@@ -10,56 +10,46 @@ type ListNode struct {
 }
 
 func splitList(node *ListNode) (*ListNode, *ListNode) {
-	root := node
-	slow := node
-	fast := node
-	var prev *ListNode = nil
+	slow, fast := node, node.Next
 	for fast != nil && fast.Next != nil {
-		prev = slow
 		slow = slow.Next
 		fast = fast.Next.Next
 	}
-	if prev != nil {
-		prev.Next = nil
-	}
-	return root, slow
+	right := slow.Next
+	slow.Next = nil
+	return node, right
 }
 
 func merge(left *ListNode, right *ListNode) *ListNode {
-	var root *ListNode = &ListNode{}
-	var node *ListNode = root
+	dummy := &ListNode{}
+	tail := dummy
 	for left != nil && right != nil {
 		if left.Val < right.Val {
-			node.Next = left
+			tail.Next = left
 			left = left.Next
-			node = node.Next
 		} else {
-			node.Next = right
+			tail.Next = right
 			right = right.Next
-			node = node.Next
 		}
+		tail = tail.Next
 	}
 	if left != nil {
-		node.Next = left
-	} else if right != nil {
-		node.Next = right
+		tail.Next = left
+	} else {
+		tail.Next = right
 	}
-	return root.Next
-}
-
-func sort(node *ListNode) *ListNode {
-	if node == nil || node.Next == nil {
-		return node
-	}
-
-	left, right := splitList(node)
-
-	sorted_left := sort(left)
-	sorted_right := sort(right)
-
-	return merge(sorted_left, sorted_right)
+	return dummy.Next
 }
 
 func sortList(head *ListNode) *ListNode {
-	return sort(head)
+	if head == nil || head.Next == nil {
+		return head
+	}
+
+	left, right := splitList(head)
+
+	sorted_left := sortList(left)
+	sorted_right := sortList(right)
+
+	return merge(sorted_left, sorted_right)
 }
