@@ -1,44 +1,29 @@
-def isStrobogrammatic(num: str) -> bool:
-    left, right = 0, len(num) - 1
-
-    map = {
-        "0": "0",
-        "1": "1",
-        "2": None,
-        "3": None,
-        "4": None,
-        "5": None,
-        "6": "9",
-        "7": None,
-        "8": "8",
-        "9": "6",
-    }
-
-    while left <= right:
-        mapped = map[num[left]]
-        if mapped != num[right]:
-            return False
-        left += 1
-        right -= 1
-
-    return True
-
-
 class Solution:
     def findStrobogrammatic(self, n: int) -> List[str]:
-        nums = ["0", "1", "6", "8", "9"]
+        pairs = [("0", "0"), ("1", "1"), ("6", "9"), ("8", "8"), ("9", "6")]
 
         ans = []
+        arr = [""] * n
 
-        def recurse(curr):
-            if len(curr) == n:
-                if curr[0] != "0" or n == 1:
-                    if isStrobogrammatic(curr):
-                        ans.append(curr)
+        def recurse(left, right):
+            if left > right:
+                ans.append("".join(arr))
                 return
 
-            for digit in nums:
-                recurse(curr + digit)
+            for a, b in pairs:
+                # no leading 0s
+                if left == 0 and n != 1 and a == "0":
+                    continue
 
-        recurse("")
+                # handle middle digits
+                if left == right and a != b:
+                    continue
+
+                # set and recurse
+                arr[left] = a
+                arr[right] = b
+
+                recurse(left + 1, right - 1)
+
+        recurse(0, n - 1)
         return ans
