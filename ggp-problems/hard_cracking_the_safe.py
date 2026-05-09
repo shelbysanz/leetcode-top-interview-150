@@ -1,19 +1,16 @@
 class Solution:
     def crackSafe(self, n: int, k: int) -> str:
-        total = k**n
-        seen = set()
+        seen, ans = set(), []
 
-        def dfs(curr):
-            if curr[-n:] in seen:
-                return
-            seen.add(curr[-n:])
+        def dfs(node):
+            for digit in range(k):
+                u = node + str(digit)
 
-            if len(seen) == total:
-                return curr
-            for i in range(k):
-                pswd = dfs(curr + str(i))
-                if pswd:
-                    return pswd
-            seen.remove(curr[-n:])
+                if u not in seen:
+                    seen.add(u)
+                    dfs(u[1:])
+                    ans.append(str(digit))
 
-        return dfs("0" * n)
+        start = "0" * (n - 1)
+        dfs(start)
+        return "".join(ans) + start
