@@ -1,60 +1,41 @@
-from collections import defaultdict
-
 class Solution:
     def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:
+        trie = {}
+        for word in words:
+            node = trie
+            for i in word:
+                node = node.setdefault(i, {})
+            node["#"] = word
+
         rows, cols = len(board), len(board[0])
-        map, ret = defaultdict(list), set()
+        matched = []
+
+        def backtracking(row, col, parent):
+            letter = board[row][col]
+            node = parent[letter]
+
+            word_match = node.pop("#", False)
+            if word_match:
+                matched.append(word_match)
+
+            board[row][col] = "#"
+
+            for row_diff, col_diff in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
+                new_row, new_col = row + row_diff, col + col_diff
+                if new_row < 0 or new_row >= rows or new_col < 0 or new_col >= cols:
+                    continue
+                if not board[new_row][new_col] in node:
+                    continue
+                backtracking(new_row, new_col, node)
+
+            board[row][col] = letter
+
+            if not node:
+                parent.pop(letter)
+
         for row in range(rows):
             for col in range(cols):
-                map[board[row][col]].append((row, col))
+                if board[row][col] in trie:
+                    backtracking(row, col, trie)
 
-        def backtrack(curr, coor, target, visited):
-            if curr == target:
-                return True
-            row, col = coor
-            top, bottom, left, right = (
-                (row - 1, col),
-                (row + 1, col),
-                (row, col - 1),
-                (row, col + 1),
-            )
-            if top[0] >= 0 and top not in visited:
-                tmp = curr + board[top[0]][top[1]]
-                if tmp == target[: len(tmp)]:
-                    visited.add(top)
-                    if backtrack(tmp, top, target, visited):
-                        return True
-                    visited.remove(top)
-            if bottom[0] < rows and bottom not in visited:
-                tmp = curr + board[bottom[0]][bottom[1]]
-                if tmp == target[: len(tmp)]:
-                    visited.add(bottom)
-                    if backtrack(tmp, bottom, target, visited):
-                        return True
-                    visited.remove(bottom)
-            if left[1] >= 0 and left not in visited:
-                tmp = curr + board[left[0]][left[1]]
-                if tmp == target[: len(tmp)]:
-                    visited.add(left)
-                    if backtrack(tmp, left, target, visited):
-                        return True
-                    visited.remove(left)
-            if right[1] < cols and right not in visited:
-                tmp = curr + board[right[0]][right[1]]
-                if tmp == target[: len(tmp)]:
-                    visited.add(right)
-                    if backtrack(tmp, right, target, visited):
-                        return True
-                    visited.remove(right)
-            return False
-
-        for word in words:
-            start = word[0]
-            for coor in map[start]:
-                visited = set()
-                visited.add(coor)
-                if backtrack(word[0], coor, word, visited):
-                    ret.add(word)
-                    break
-
-        return list(ret)
+        return matched
